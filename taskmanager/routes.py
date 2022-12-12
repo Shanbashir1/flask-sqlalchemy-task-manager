@@ -3,18 +3,21 @@ from taskmanager import app, db
 from taskmanager.models import Category, Task
 
 
+# Task functions
 @app.route("/")
 def home():
     tasks = list(Task.query.order_by(Task.id).all())
     return render_template("tasks.html", tasks=tasks)
 
 
+# Category functions
 @app.route("/categories")
 def categories():
     categories = list(Category.query.order_by(Category.category_name).all())
     return render_template("categories.html", categories=categories)
 
 
+# add _category
 @app.route("/add_category", methods=["GET", "POST"])
 def add_category():
     if request.method == "POST":
@@ -25,6 +28,7 @@ def add_category():
     return render_template("add_category.html")
 
 
+# Edit_category
 @app.route("/edit_category/<int:category_id>", methods=["GET", "POST"])
 def edit_category(category_id):
     category = Category.query.get_or_404(category_id)
@@ -35,6 +39,7 @@ def edit_category(category_id):
     return render_template("edit_category.html", category=category)
 
 
+# delete_category
 @app.route("/delete_category/<int:category_id>")
 def delete_category(category_id):
     category = Category.query.get_or_404(category_id)
@@ -43,6 +48,7 @@ def delete_category(category_id):
     return redirect(url_for("categories"))
 
 
+# Add_task
 @app.route("/add_task", methods=["GET", "POST"])
 def add_task():
     categories = list(Category.query.order_by(Category.category_name).all())
@@ -60,6 +66,7 @@ def add_task():
     return render_template("add_task.html", categories=categories)
 
 
+# Edit_task
 @app.route("/edit_task/<int:task_id>", methods=["GET", "POST"])
 def edit_task(task_id):
     task = Task.query.get_or_404(task_id)
@@ -72,3 +79,12 @@ def edit_task(task_id):
         task.category_id = request.form.get("category_id")
         db.session.commit()
     return render_template("edit_task.html", task=task, categories=categories)
+
+
+# delete_Task
+@app.route("/delete_task/<int:task_id>")
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    db.session.delete(task)
+    db.session.commit()
+    return redirect(url_for("home"))
